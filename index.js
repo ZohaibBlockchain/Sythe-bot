@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the Test Service");
+  res.send("Welcome to the SYTHE AI Bot");
 });
 
 
