@@ -28,9 +28,6 @@ class instrument {
   }
 }
 
-
-
-
 export async function tradeFuture(signal) {
   console.info("signal ", signal);
   if (await checkConnection()) {
@@ -66,14 +63,12 @@ export async function tradeFuture(signal) {
         }
       }
       else {
+        console.log('No reason to close the trade');
       }
     }
     else {//New Trade...
-      if (UD[instrumentIndex].flags[0] == signal.side && UD[instrumentIndex].flags[1] == signal.side && UD[instrumentIndex].flags[2] == signal.side) {
+      if (UD[instrumentIndex].flags[0] == signal.side && UD[instrumentIndex].flags[2] == signal.side) {
         let NewLeverage = await setLeverage(signal);
-
-        console.log('hellow@ ', NewLeverage["leverage"], signal.leverage)
-
         if (NewLeverage["leverage"] == signal.leverage) {
           let newTrade = await CreateNewTrade(signal);
           console.log(newTrade);
@@ -291,7 +286,7 @@ export async function tradeEngine() {
       tradeCounter++;
       let totalFee = getFees(UD[i]);
       let desireProfit = await checkDesireProfit(UD[i], totalFee);
-      console.log('SYMBOL: ', UD[i].symbol, ' CURRENT PNL: ', desireProfit.pnl, ' in percentage:', desireProfit.profitPercentage, '% Fee ', totalFee,' leverage: ',UD[i].leverage);
+      console.log('SYMBOL: ', UD[i].symbol, ' CURRENT PNL: ', desireProfit.pnl, ' in percentage:', desireProfit.profitPercentage, '% Fee ', totalFee, ' leverage: ', UD[i].leverage);
       if (desireProfit.profitable) {//if true then close the trade...
         UD[i].currentTrade = false;
         let prvTrade = await settlePreviousTrade(UD[i]);
