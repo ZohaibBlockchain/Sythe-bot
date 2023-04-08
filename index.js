@@ -1,6 +1,6 @@
 import express from "express";
 const app = express();
-const port = 7777;
+const port = 443;
 import { tradeFuture, UD, tradeCounter, resetBot, tradeEngine } from "./trade.js";
 
 import bodyParser from "body-parser";
@@ -48,7 +48,7 @@ function botCore() {
     console.clear();
     console.log('V1 SYTHE AI Bot +_+ : ');
     console.log('Current Instruments are: ', UD.length);
-    console.log('BOT Health 100 % and total number of trade are: ', tradeCounter);
+    console.log('SYTHE BOT Health 100 % and total number of trade are: ', tradeCounter);
     DisplayCounter = 0;
   }
   DisplayCounter++;
