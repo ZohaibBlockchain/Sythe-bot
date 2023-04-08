@@ -12,10 +12,6 @@ export let UD = [];
 export let tradeCounter = 0;
 const desireProfitPercentage = 0.5;
 
-
-
-
-
 class instrument {
   constructor(symbol, side, tradeAmount, leverage) {
     this.symbol = symbol;
