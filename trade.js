@@ -9,7 +9,7 @@ const binance = new Binance().options({
   APISECRET: process.env.API_SECRET,
 });
 
-const desireProfitPercentage = 0.1;
+const desireProfitPercentage = 1.5;
 
 
 let InstrumentRecharge = { BTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], ETHUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], LTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }] }
