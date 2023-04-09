@@ -9,14 +9,14 @@ const binance = new Binance().options({
   APISECRET: process.env.API_SECRET,
 });
 
-const desireProfitPercentage = 0.25;
+const desireProfitPercentage = 1.2;
 let ProfitableTrades = 0;
 
 let InstrumentRecharge = { BTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], ETHUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], LTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }] }
 
 
 function onCoolDown(symbol, side) {
-
+  console.log(symbol,side);
   if (symbol == 'BTCUSDT' && side == 'long') {
     return InstrumentRecharge.BTCUSDT[0].cooldown;
   }
@@ -28,6 +28,8 @@ function onCoolDown(symbol, side) {
 
 function tradeComplete(symbol, side, buyPrice, sellprice) {
 
+  console.log(symbol, side, buyPrice, sellprice,'TC________');
+ 
   if (symbol == 'BTCUSDT' && side == 'long') {
     InstrumentRecharge.BTCUSDT[0].cooldown = true;
     InstrumentRecharge.BTCUSDT[0].buyPrice = buyPrice;
@@ -44,6 +46,8 @@ function tradeComplete(symbol, side, buyPrice, sellprice) {
 
 async function resetCoolDown() {
   let btcPrice = await getInstrumentPrice('BTCUSDT');
+  console.log('TC2________',InstrumentRecharge);
+
 
   if (InstrumentRecharge.BTCUSDT[0].cooldown) {
     (InstrumentRecharge.BTCUSDT[0].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[0].ticksLeft-- : null;
@@ -86,7 +90,9 @@ export async function _tradeEngine() {
             let totalFee = getFees({ tradeAmount: instruments.positionAmt, price: instruments.entryPrice });
             let side = getType(instruments.positionAmt);
             let desireProfit = await checkDesireProfit({ side: side, tradeAmount: Math.abs(instruments.positionAmt), leverage: instruments.leverage, markPrice: instruments.markPrice, price: instruments.entryPrice }, totalFee);
-            console.log('PNL: ', desireProfit);
+            
+            console.log('PNL: ', desireProfit.profitable,' Profit Percentage: ', desireProfit.profitPercentage,'PNL: ',desireProfit.pnl);
+          
             if (desireProfit.profitable) {//if true then close the trade...
               engineFlag = false;
 
@@ -112,7 +118,6 @@ export async function _tradeEngine() {
               });
 
               let signalSide = getSide(signalInstrument.flags);
-              console.log(signalSide.res, '--X');
 
               if (signalSide.value != undefined) {
 
@@ -160,8 +165,7 @@ export async function _tradeEngine() {
               let side = getSide(parsedIns[i].flags);
 
               if (side.value != undefined) {
-
-                if (!onCoolDown(parsedIns[i].symbol, side)) {
+                if (!onCoolDown(parsedIns[i].symbol, side.value)) {
                   let price = await getInstrumentPrice(parsedIns[i].symbol);
                   let positionAmt = parsedIns[i].positionAmt;
                   let leverageAmt = parsedIns[i].leverageAmt;
@@ -180,7 +184,7 @@ export async function _tradeEngine() {
                     throw ('unable to set leverage');
                   }
                 } else {
-
+                    console.log('Instrument on coolDown wait please');
                 }
               }
               else {
