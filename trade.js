@@ -10,7 +10,7 @@ const binance = new Binance().options({
 });
 
 const desireProfitPercentage = 1.5;
-
+let ProfitableTrades = 0;
 
 let InstrumentRecharge = { BTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], ETHUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], LTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }] }
 
@@ -93,6 +93,7 @@ export async function _tradeEngine() {
               let prvTrade = await settlePreviousTrade({ side: side, tradeAmount: Math.abs(instruments.positionAmt), symbol: instruments.symbol });
               if (prvTrade["symbol"] == instruments.symbol) {//confirmed closed
                 console.log('The trade resulted in a profit.!')
+                ProfitableTrades++;
                 tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice);  //Now update that we have completed the trade
                 console.log('Profit: ', desireProfit);
                 engineFlag = true;
@@ -197,6 +198,9 @@ export async function _tradeEngine() {
     console.log(error);
     engineFlag = true;
   }
+
+
+  console.log('Profitable number of trades: ',ProfitableTrades);
 }
 
 
