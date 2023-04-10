@@ -447,9 +447,9 @@ function getType(value) {
 function getSide(flags) {
 
   let flag0 = (flags[0] == 'long' ? 1 : -1);
-  let flag1 = (flags[1] == 'long' ? 2 : -2);
+  let flag1 = (flags[1] == 'long' ? 1 : -1);
   let flag2 = (flags[2] == 'long' ? 2 : -2);
-  let flag3 = (flags[3] == 'long' ? 2 : -2);
+  let flag3 = (flags[3] == 'long' ? 3 : -3);
   let flag4 = (flags[4] == 'long' ? 3 : -3);
   let res = flag0 + flag1 + flag2 + flag3 + flag4;
   if (res == 0) {
