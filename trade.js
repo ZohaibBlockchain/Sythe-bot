@@ -151,7 +151,7 @@ export async function _tradeEngine() {
 
               if (signalSide.value != undefined) {
 
-                if (blackFlag(side, signalSide.value,signalInstrument.flags) && Math.abs(signalSide.res) > 2 &&) {
+                if (blackFlag(side, signalSide.value,signalInstrument.flags) && Math.abs(signalSide.res) > 3) {
 
                   engineFlag = false;
                   let prvTrade = await settlePreviousTrade({ side: side, tradeAmount: Math.abs(instruments.positionAmt), symbol: instruments.symbol });
