@@ -87,11 +87,13 @@ function tradeComplete(symbol, side, buyPrice, sellprice, result) {
 
 
 async function resetCoolDown() {
-  let btcPrice = await getInstrumentPrice('BTCUSDT');
-  console.log('ResetCoolDown BTC PRICE: ', btcPrice);
+ 
+
 
   //long
   if (InstrumentRecharge.BTCUSDT[0].cooldown) {
+    let btcPrice = await getInstrumentPrice('BTCUSDT');
+    console.log('ResetCoolDown BTC PRICE: ', btcPrice);
     (InstrumentRecharge.BTCUSDT[0].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[0].ticksLeft-- : null;
     if (InstrumentRecharge.BTCUSDT[0].ticksLeft == 0) {
       InstrumentRecharge.BTCUSDT[0].cooldown = false;
@@ -117,6 +119,8 @@ async function resetCoolDown() {
   }
   //Short
   if (InstrumentRecharge.BTCUSDT[1].cooldown) {
+    let btcPrice = await getInstrumentPrice('BTCUSDT');
+    console.log('ResetCoolDown BTC PRICE: ', btcPrice);
     (InstrumentRecharge.BTCUSDT[1].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[1].ticksLeft-- : null;
     if (InstrumentRecharge.BTCUSDT[1].ticksLeft == 0) {
       InstrumentRecharge.BTCUSDT[1].cooldown = false;
