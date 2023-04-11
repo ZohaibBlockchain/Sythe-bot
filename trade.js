@@ -151,7 +151,8 @@ export async function _tradeEngine() {
 
               if (signalSide.value != undefined) {
 
-                if (blackFlag(side, signalSide.value) && Math.abs(signalSide.res) > 2) {
+                if (blackFlag(side, signalSide.value,signalInstrument.flags) && Math.abs(signalSide.res) > 2 &&) {
+
                   engineFlag = false;
                   let prvTrade = await settlePreviousTrade({ side: side, tradeAmount: Math.abs(instruments.positionAmt), symbol: instruments.symbol });
                   if (prvTrade["symbol"] == instruments.symbol) {//confirmed closed
@@ -406,12 +407,17 @@ async function checkDesireProfit(instrument, fee) {
 
 
 
-function blackFlag(side, flagSide) {
+function blackFlag(side, flagSide,flags) {
   if (side == flagSide) {
     return false;
   }
   else {
-    return true;
+      if(flagSide[3] != side && flagSide[4] != side)
+      {
+        return true;
+      }else{
+        return false;
+      }
   }
 }
 
