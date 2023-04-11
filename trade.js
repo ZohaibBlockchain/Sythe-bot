@@ -256,7 +256,7 @@ export async function _tradeEngine() {
             } else {
               let side = getFlag(parsedIns[i].flags);
               if (side != undefined) {
-                if (!onCoolDown(parsedIns[i].symbol, side.value)) {
+                if (!onCoolDown(parsedIns[i].symbol, side)) {
                   let price = await getInstrumentPrice(parsedIns[i].symbol);
                   let positionAmt = parsedIns[i].positionAmt;
                   let leverageAmt = parsedIns[i].leverageAmt;
