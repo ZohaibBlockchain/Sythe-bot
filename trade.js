@@ -109,13 +109,13 @@ async function resetCoolDown() {
       }
     }
     else {
-      if (btcPrice <= InstrumentRecharge.BTCUSDT[0].buyPrice) {
+      let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 1.5;
+      if (btcPrice <= diff+ InstrumentRecharge.BTCUSDT[0].buyPrice) {
         InstrumentRecharge.BTCUSDT[0].cooldown = false
         InstrumentRecharge.BTCUSDT[0].ticksLeft = 0;
         return;
       }
     }
-
   }
   //Short
   if (InstrumentRecharge.BTCUSDT[1].cooldown) {
