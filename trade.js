@@ -255,8 +255,7 @@ export async function _tradeEngine() {
               console.log('------End Trade starting Block----')
             } else {
               let side = getFlag(parsedIns[i].flags);
-
-              if (side.value != undefined) {
+              if (side != undefined) {
                 if (!onCoolDown(parsedIns[i].symbol, side.value)) {
                   let price = await getInstrumentPrice(parsedIns[i].symbol);
                   let positionAmt = parsedIns[i].positionAmt;
@@ -550,6 +549,7 @@ function getType(value) {
 
 function getFlag(flags) {
 
+  console.log(flags);
   if (flags[0] == flags[1] && flags[0] == flags[2]) {
     return flags[0];
   }
