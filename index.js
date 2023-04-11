@@ -1,11 +1,7 @@
 import express from "express";
 const app = express();
 const port = 443;
-import {_tradeEngine } from "./trade.js";
-
-
-
-
+import {_tradeEngine,IterationTime } from "./trade.js";
 
 process.on('uncaughtException', function (err) {
   console.log(err);
@@ -20,7 +16,7 @@ let DisplayCounter = 0;
 async function botCore() {
  
   await _tradeEngine();
-  setTimeout(botCore, 1000);
+  setTimeout(botCore, IterationTime*1000);
 }
 
  botCore();
