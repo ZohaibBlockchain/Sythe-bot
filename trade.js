@@ -58,16 +58,17 @@ async function resetCoolDown() {
     (InstrumentRecharge.BTCUSDT[0].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[0].ticksLeft-- : null;
     (InstrumentRecharge.BTCUSDT[0].ticksLeft == 0) ? InstrumentRecharge.BTCUSDT[0].cooldown = false : null;
     let diff = (InstrumentRecharge.BTCUSDT[0].sellPrice - InstrumentRecharge.BTCUSDT[0].buyPrice) / 2;
+      diff = (diff/1.5)+diff;
     if (btcPrice <= diff + InstrumentRecharge.BTCUSDT[0].buyPrice) {
       InstrumentRecharge.BTCUSDT[0].cooldown = false
       InstrumentRecharge.BTCUSDT[0].ticksLeft = 0;
     }
-
   }
   if (InstrumentRecharge.BTCUSDT[1].cooldown) {
     (InstrumentRecharge.BTCUSDT[1].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[1].ticksLeft-- : null;
     (InstrumentRecharge.BTCUSDT[1].ticksLeft == 0) ? InstrumentRecharge.BTCUSDT[1].cooldown = false : null;
     let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 2;
+    diff = (diff/1.5)+diff;
     if (btcPrice >= diff + InstrumentRecharge.BTCUSDT[1].buyPrice) {
       InstrumentRecharge.BTCUSDT[1].cooldown = false
       InstrumentRecharge.BTCUSDT[1].ticksLeft = 0;
@@ -289,9 +290,6 @@ async function getInstrumentPrice(symbol) {
 
 
 
-
-
-
 async function setLeverage(instrument) {
   try {
     return await binance.futuresLeverage(instrument.symbol, instrument.leverage);
@@ -346,8 +344,6 @@ function getFees(instrument) {
   const feeInBaseCurrency = fee * usdtRate; // Convert the fee amount to USDT
   return (feeInBaseCurrency * 2);
 }
-
-
 
 
 
