@@ -12,7 +12,6 @@ const binance = new Binance().options({
 
 const desireProfitPercentage = 0.5;
 let ProfitableTrades = 0;
-
 let InstrumentRecharge = { BTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], ETHUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], LTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }] }
 
 let BTCPrice = [];
@@ -58,7 +57,7 @@ async function resetCoolDown() {
     (InstrumentRecharge.BTCUSDT[0].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[0].ticksLeft-- : null;
     (InstrumentRecharge.BTCUSDT[0].ticksLeft == 0) ? InstrumentRecharge.BTCUSDT[0].cooldown = false : null;
     let diff = (InstrumentRecharge.BTCUSDT[0].sellPrice - InstrumentRecharge.BTCUSDT[0].buyPrice) / 2;
-      diff = (diff/1.5)+diff;
+      diff = (diff/4)+diff;
     if (btcPrice <= diff + InstrumentRecharge.BTCUSDT[0].buyPrice) {
       InstrumentRecharge.BTCUSDT[0].cooldown = false
       InstrumentRecharge.BTCUSDT[0].ticksLeft = 0;
@@ -68,7 +67,7 @@ async function resetCoolDown() {
     (InstrumentRecharge.BTCUSDT[1].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[1].ticksLeft-- : null;
     (InstrumentRecharge.BTCUSDT[1].ticksLeft == 0) ? InstrumentRecharge.BTCUSDT[1].cooldown = false : null;
     let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 2;
-    diff = (diff/1.5)+diff;
+    diff = (diff/4)+diff;
     if (btcPrice >= diff + InstrumentRecharge.BTCUSDT[1].buyPrice) {
       InstrumentRecharge.BTCUSDT[1].cooldown = false
       InstrumentRecharge.BTCUSDT[1].ticksLeft = 0;
