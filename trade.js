@@ -12,7 +12,7 @@ const binance = new Binance().options({
 export const IterationTime = 1;//one second
 const coolDownProfit = (300 / IterationTime);//5 minutes
 const coolDownLoss = (900 / IterationTime);//15 minutes
-const desireProfitPercentage = 0.5;
+const desireProfitPercentage = 0.25;
 let ProfitableTrades = 0;
 let lossTrades = 0;
 
