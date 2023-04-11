@@ -46,14 +46,14 @@ function tradeComplete(symbol, side, buyPrice, sellprice, result) {
       InstrumentRecharge.BTCUSDT[1].cooldown = true;
       InstrumentRecharge.BTCUSDT[1].buyPrice = buyPrice;
       InstrumentRecharge.BTCUSDT[1].sellPrice = sellprice;
-      InstrumentRecharge.BTCUSDT[1].ticksLeft = coolDownValue;
+      InstrumentRecharge.BTCUSDT[1].ticksLeft = coolDownLoss;
       InstrumentRecharge.BTCUSDT[1].result = result;
     }
     if (symbol == 'BTCUSDT' && side == 'short') {
       InstrumentRecharge.BTCUSDT[0].cooldown = true;
       InstrumentRecharge.BTCUSDT[0].buyPrice = buyPrice;
       InstrumentRecharge.BTCUSDT[0].sellPrice = sellprice;
-      InstrumentRecharge.BTCUSDT[0].ticksLeft = coolDownValue;
+      InstrumentRecharge.BTCUSDT[0].ticksLeft = coolDownLoss;
       InstrumentRecharge.BTCUSDT[0].result = result;
     }
 
@@ -66,14 +66,14 @@ function tradeComplete(symbol, side, buyPrice, sellprice, result) {
       InstrumentRecharge.BTCUSDT[0].cooldown = true;
       InstrumentRecharge.BTCUSDT[0].buyPrice = buyPrice;
       InstrumentRecharge.BTCUSDT[0].sellPrice = sellprice;
-      InstrumentRecharge.BTCUSDT[0].ticksLeft = coolDownValue;
+      InstrumentRecharge.BTCUSDT[0].ticksLeft = coolDownProfit;
       InstrumentRecharge.BTCUSDT[0].result = result;
     }
     if (symbol == 'BTCUSDT' && side == 'short') {
       InstrumentRecharge.BTCUSDT[1].cooldown = true;
       InstrumentRecharge.BTCUSDT[1].buyPrice = buyPrice;
       InstrumentRecharge.BTCUSDT[1].sellPrice = sellprice;
-      InstrumentRecharge.BTCUSDT[1].ticksLeft = coolDownValue;
+      InstrumentRecharge.BTCUSDT[1].ticksLeft = coolDownProfit;
       InstrumentRecharge.BTCUSDT[1].result = result;
     }
     //Other Instruments
