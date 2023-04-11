@@ -87,7 +87,7 @@ function tradeComplete(symbol, side, buyPrice, sellprice, result) {
 
 
 async function resetCoolDown() {
- 
+
 
 
   //long
@@ -109,7 +109,7 @@ async function resetCoolDown() {
       }
     }
     else {
-      if (btcPrice <=  InstrumentRecharge.BTCUSDT[0].buyPrice) {
+      if (btcPrice <= InstrumentRecharge.BTCUSDT[0].buyPrice) {
         InstrumentRecharge.BTCUSDT[0].cooldown = false
         InstrumentRecharge.BTCUSDT[0].ticksLeft = 0;
         return;
@@ -341,14 +341,13 @@ async function getTradeInfo() {
 
 async function getInstrumentPrice(symbol) {
   return new Promise(async (resolve, reject) => {
-    binance.prevDay(symbol, (error, prevDay) => {
-      if (error) {
-        console.error(error);
-        reject(undefined);
-      } else {
-        resolve(prevDay.lastPrice);
-      }
-    });
+    try {
+      let value = await binance.futuresPrices()
+      const BTCUSDTValue = value.BTCUSDT;
+      resolve(BTCUSDTValue);
+    } catch (error) {
+      reject(undefined);
+    }
   });
 }
 
@@ -481,44 +480,6 @@ function blackFlag(side, flagSide) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// async function getInstrumentDetail(symbol) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       let position_data = await binance.futuresPositionRisk(), markets = Object.keys(position_data);
-//       position_data.forEach(instrument => {
-//         if (instrument.symbol == symbol)
-//           resolve(instrument);
-//       });
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-
-// }
-
-
-
-
 async function getPositionData() {
   let position_data = await binance.futuresPositionRisk(), markets = Object.keys(position_data);
   let Positions = [];
@@ -534,11 +495,6 @@ async function getPositionData() {
 
 
 
-
-
-
-
-
 function getType(value) {
   if (value < 0) {
     return "short";
@@ -546,10 +502,6 @@ function getType(value) {
     return "long";
   }
 }
-
-
-
-
 
 function getFlag(flags) {
 
@@ -564,23 +516,3 @@ function getFlag(flags) {
 
 
 
-
-
-// function getSide(flags) {
-
-//   let flag0 = (flags[0] == 'long' ? 1 : -1);
-//   let flag1 = (flags[1] == 'long' ? 1 : -1);
-//   let flag2 = (flags[2] == 'long' ? 1 : -1);
-//   let flag3 = (flags[3] == 'long' ? 3 : -3);
-//   let flag4 = (flags[4] == 'long' ? 4 : -4);
-//   let res = flag0 + flag1 + flag2 + flag3 + flag4;
-//   if (res == 0) {
-//     return { value: undefined, res };
-//   }
-//   else if (res > 0) {
-//     return { value: 'long', res };
-//   }
-//   else if (res < 0) {
-//     return { value: 'short', res };
-//   }
-// }
