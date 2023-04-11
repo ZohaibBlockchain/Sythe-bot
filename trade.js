@@ -263,7 +263,7 @@ export async function _tradeEngine() {
                   let tradeAmt = ((positionAmt * leverageAmt) / price).toFixed(3);
                   let _setLeverage = await setLeverage({ symbol: parsedIns[i].symbol, leverage: leverageAmt });
                   if (_setLeverage["leverage"] == leverageAmt) {
-                    let newTrade = await CreateNewTrade({ side: side.value, tradeAmount: tradeAmt, symbol: parsedIns[i].symbol });
+                    let newTrade = await CreateNewTrade({ side: side, tradeAmount: tradeAmt, symbol: parsedIns[i].symbol });
                     engineFlag = false;
                     console.log(newTrade);
                     if (newTrade["symbol"] == parsedIns[i].symbol) {//successfully created new trade
