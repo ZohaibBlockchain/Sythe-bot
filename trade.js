@@ -12,6 +12,7 @@ const binance = new Binance().options({
 
 const desireProfitPercentage = 0.5;
 let ProfitableTrades = 0;
+let lossTrades = 0;
 let InstrumentRecharge = { BTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], ETHUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }], LTCUSDT: [{ cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }, { cooldown: false, buyPrice: 0, sellPrice: 0, ticksLeft: 0 }] }
 
 let BTCPrice = [];
@@ -34,7 +35,7 @@ function onCoolDown(symbol, side) {
 
 function tradeComplete(symbol, side, buyPrice, sellprice) {
 
-  console.log(symbol, side, buyPrice, sellprice, 'TC________');
+  console.log(symbol, side, buyPrice, sellprice, 'TC');
 
   if (symbol == 'BTCUSDT' && side == 'long') {
     InstrumentRecharge.BTCUSDT[0].cooldown = true;
@@ -46,18 +47,21 @@ function tradeComplete(symbol, side, buyPrice, sellprice) {
     InstrumentRecharge.BTCUSDT[1].cooldown = true;
     InstrumentRecharge.BTCUSDT[1].buyPrice = buyPrice;
     InstrumentRecharge.BTCUSDT[1].sellPrice = sellprice;
-    InstrumentRecharge.BTCUSDT[0].ticksLeft = 300;
+    InstrumentRecharge.BTCUSDT[1].ticksLeft = 300;
   }
 }
 
 async function resetCoolDown() {
   let btcPrice = await getInstrumentPrice('BTCUSDT');
-
+  console.log('ResetCoolDown BTC PRICE: ',btcPrice);
   if (InstrumentRecharge.BTCUSDT[0].cooldown) {
     (InstrumentRecharge.BTCUSDT[0].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[0].ticksLeft-- : null;
-    (InstrumentRecharge.BTCUSDT[0].ticksLeft == 0) ? InstrumentRecharge.BTCUSDT[0].cooldown = false : null;
-    let diff = (InstrumentRecharge.BTCUSDT[0].sellPrice - InstrumentRecharge.BTCUSDT[0].buyPrice) / 2;
-      diff = (diff/4)+diff;
+    if(InstrumentRecharge.BTCUSDT[0].ticksLeft == 0)
+    {
+      InstrumentRecharge.BTCUSDT[0].cooldown = false;
+      return;
+    }
+    let diff = (InstrumentRecharge.BTCUSDT[0].sellPrice - InstrumentRecharge.BTCUSDT[0].buyPrice) / 1.5;
     if (btcPrice <= diff + InstrumentRecharge.BTCUSDT[0].buyPrice) {
       InstrumentRecharge.BTCUSDT[0].cooldown = false
       InstrumentRecharge.BTCUSDT[0].ticksLeft = 0;
@@ -65,9 +69,12 @@ async function resetCoolDown() {
   }
   if (InstrumentRecharge.BTCUSDT[1].cooldown) {
     (InstrumentRecharge.BTCUSDT[1].ticksLeft > 0) ? InstrumentRecharge.BTCUSDT[1].ticksLeft-- : null;
-    (InstrumentRecharge.BTCUSDT[1].ticksLeft == 0) ? InstrumentRecharge.BTCUSDT[1].cooldown = false : null;
-    let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 2;
-    diff = (diff/4)+diff;
+    if(InstrumentRecharge.BTCUSDT[1].ticksLeft == 0)
+    {
+      InstrumentRecharge.BTCUSDT[1].cooldown = false;
+      return;
+    }
+    let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 1.5;
     if (btcPrice >= diff + InstrumentRecharge.BTCUSDT[1].buyPrice) {
       InstrumentRecharge.BTCUSDT[1].cooldown = false
       InstrumentRecharge.BTCUSDT[1].ticksLeft = 0;
@@ -156,6 +163,7 @@ export async function _tradeEngine() {
                   engineFlag = false;
                   let prvTrade = await settlePreviousTrade({ side: side, tradeAmount: Math.abs(instruments.positionAmt), symbol: instruments.symbol });
                   if (prvTrade["symbol"] == instruments.symbol) {//confirmed closed
+                   lossTrades++;
                     console.log('The trade resulted in a loss.!')
                     engineFlag = true;
                   }
@@ -234,7 +242,7 @@ export async function _tradeEngine() {
     engineFlag = true;
   }
 
-
+  console.log('lost trades are : ', lossTrades);
   console.log('Profitable number of trades: ', ProfitableTrades);
 }
 
@@ -491,19 +499,29 @@ function getType(value) {
 
 
 
-//weights
-//flag 0 = 1,flag 1 = 2,flag 2 = 2 ,flag 3 = 2,flag 4 = 3
-//long +
-//short -
+
+
+function buySide(flags) {
+
+  let flag0 = (flags[0] == 'long' ? 1 : -1);
+  let flag1 = (flags[1] == 'long' ? 1 : -1);
+  let flag2 = (flags[2] == 'long' ? 1 : -1);
+  let flag3 = (flags[3] == 'long' ? 3 : -3);
+  let flag4 = (flags[4] == 'long' ? 4 : -4);
+  
+
+
+
+}
 
 
 function getSide(flags) {
 
   let flag0 = (flags[0] == 'long' ? 1 : -1);
   let flag1 = (flags[1] == 'long' ? 1 : -1);
-  let flag2 = (flags[2] == 'long' ? 2 : -2);
+  let flag2 = (flags[2] == 'long' ? 1 : -1);
   let flag3 = (flags[3] == 'long' ? 3 : -3);
-  let flag4 = (flags[4] == 'long' ? 3 : -3);
+  let flag4 = (flags[4] == 'long' ? 4 : -4);
   let res = flag0 + flag1 + flag2 + flag3 + flag4;
   if (res == 0) {
     return { value: undefined, res };
@@ -515,5 +533,3 @@ function getSide(flags) {
     return { value: 'short', res };
   }
 }
-// let x = ['long','long','short','short','long'];
-// console.log(getSide(x));
