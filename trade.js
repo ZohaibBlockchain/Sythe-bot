@@ -1,7 +1,7 @@
 import Binance from "node-binance-api";
 import dotenv from "dotenv";
 import http from 'http';
-import { maintain30, getPriceDirection } from './functions.js';
+import { maintainArr, getPriceDirection } from './functions.js';
 dotenv.config();
 
 
@@ -10,9 +10,10 @@ const binance = new Binance().options({
   APISECRET: process.env.API_SECRET,
 });
 export const IterationTime = 1;//one second
-const coolDownProfit = (300 / IterationTime);//5 minutes
+const coolDownProfit = (900 / IterationTime);//5 minutes
 const coolDownLoss = (900 / IterationTime);//15 minutes
-const desireProfitPercentage = 0.25;
+const desireProfitPercentage = 2;
+const totalPNL = 0;
 let ProfitableTrades = 0;
 let lossTrades = 0;
 
@@ -35,44 +36,45 @@ function onCoolDown(symbol, side) {
 }
 
 
-function tradeComplete(symbol, side, buyPrice, sellprice, result) {
+function tradeComplete(symbol, side, buyPrice, sellPrice, result, desireProfit) {
 
-  console.log(symbol, side, buyPrice, sellprice, 'TC');
-
+  totalPNL += desireProfit;
+  console.log(totalPNL);
   if (result == "LOSS") {
     lossTrades++;
     console.log('The trade resulted in a loss.!')
     if (symbol == 'BTCUSDT' && side == 'long') {
       InstrumentRecharge.BTCUSDT[1].cooldown = true;
       InstrumentRecharge.BTCUSDT[1].buyPrice = buyPrice;
-      InstrumentRecharge.BTCUSDT[1].sellPrice = sellprice;
+      InstrumentRecharge.BTCUSDT[1].sellPrice = sellPrice;
       InstrumentRecharge.BTCUSDT[1].ticksLeft = coolDownLoss;
       InstrumentRecharge.BTCUSDT[1].result = result;
     }
     if (symbol == 'BTCUSDT' && side == 'short') {
       InstrumentRecharge.BTCUSDT[0].cooldown = true;
       InstrumentRecharge.BTCUSDT[0].buyPrice = buyPrice;
-      InstrumentRecharge.BTCUSDT[0].sellPrice = sellprice;
+      InstrumentRecharge.BTCUSDT[0].sellPrice = sellPrice;
       InstrumentRecharge.BTCUSDT[0].ticksLeft = coolDownLoss;
       InstrumentRecharge.BTCUSDT[0].result = result;
     }
-
     //Other Instruments
   }
   else {
     ProfitableTrades++;
     console.log('The trade resulted in a profit.!')
+    console.log('Profit: ', desireProfit);
+
     if (symbol == 'BTCUSDT' && side == 'long') {
       InstrumentRecharge.BTCUSDT[0].cooldown = true;
       InstrumentRecharge.BTCUSDT[0].buyPrice = buyPrice;
-      InstrumentRecharge.BTCUSDT[0].sellPrice = sellprice;
+      InstrumentRecharge.BTCUSDT[0].sellPrice = sellPrice;
       InstrumentRecharge.BTCUSDT[0].ticksLeft = coolDownProfit;
       InstrumentRecharge.BTCUSDT[0].result = result;
     }
     if (symbol == 'BTCUSDT' && side == 'short') {
       InstrumentRecharge.BTCUSDT[1].cooldown = true;
       InstrumentRecharge.BTCUSDT[1].buyPrice = buyPrice;
-      InstrumentRecharge.BTCUSDT[1].sellPrice = sellprice;
+      InstrumentRecharge.BTCUSDT[1].sellPrice = sellPrice;
       InstrumentRecharge.BTCUSDT[1].ticksLeft = coolDownProfit;
       InstrumentRecharge.BTCUSDT[1].result = result;
     }
@@ -109,8 +111,8 @@ async function resetCoolDown() {
       }
     }
     else {
-      let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 1.5;
-      if (btcPrice <= diff+ InstrumentRecharge.BTCUSDT[0].buyPrice) {
+      let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 1.75;
+      if (btcPrice <= diff + InstrumentRecharge.BTCUSDT[0].buyPrice) {
         InstrumentRecharge.BTCUSDT[0].cooldown = false
         InstrumentRecharge.BTCUSDT[0].ticksLeft = 0;
         return;
@@ -126,7 +128,6 @@ async function resetCoolDown() {
       InstrumentRecharge.BTCUSDT[1].cooldown = false;
       return;
     }
-
     if (InstrumentRecharge.BTCUSDT[1].result == "LOSS") {
       if (btcPrice >= InstrumentRecharge.BTCUSDT[1].buyPrice) {
         InstrumentRecharge.BTCUSDT[1].cooldown = false
@@ -135,7 +136,7 @@ async function resetCoolDown() {
       }
     }
     else {
-      let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 1.5;
+      let diff = (InstrumentRecharge.BTCUSDT[1].buyPrice - InstrumentRecharge.BTCUSDT[1].sellPrice) / 1.75;
       if (btcPrice >= InstrumentRecharge.BTCUSDT[1].buyPrice) {
         InstrumentRecharge.BTCUSDT[1].cooldown = false
         InstrumentRecharge.BTCUSDT[1].ticksLeft = 0;
@@ -150,13 +151,13 @@ async function resetCoolDown() {
 
 async function updatePrice(symbol, price) {
   if (symbol == "BTCUSDT") {
-    maintain30(BTCPrice, parseFloat(price));
+    maintainArr(BTCPrice, parseFloat(price));
   }
   else if (symbol == "ETHUSDT") {
-    maintain30(ETHPrice, parseFloat(price));
+    maintainArr(ETHPrice, parseFloat(price));
   }
   else if (symbol == "LTCUSDT") {
-    maintain30(LTCPrice, parseFloat(price));
+    maintainArr(LTCPrice, parseFloat(price));
   }
 }
 
@@ -199,8 +200,7 @@ export async function _tradeEngine() {
               engineFlag = false;
               let prvTrade = await settlePreviousTrade({ side: side, tradeAmount: Math.abs(instruments.positionAmt), symbol: instruments.symbol });
               if (prvTrade["symbol"] == instruments.symbol) {//confirmed closed
-                tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice, "PROFITABLE");  //Now update that we have completed the trade
-                console.log('Profit: ', desireProfit);
+                tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice, "PROFITABLE",desireProfit.pnl);  //Now update that we have completed the trade
                 engineFlag = true;
               }
               else {
@@ -216,13 +216,13 @@ export async function _tradeEngine() {
                   signalInstrument = element;
               });
 
-              let signalSide = getFlag(signalInstrument.flags);
+              let signalSide = getSellFlag(signalInstrument.flags);
               if (signalSide != undefined) {
                 if (blackFlag(side, signalSide)) {
                   engineFlag = false;
                   let prvTrade = await settlePreviousTrade({ side: side, tradeAmount: Math.abs(instruments.positionAmt), symbol: instruments.symbol });
                   if (prvTrade["symbol"] == instruments.symbol) {//confirmed closed
-                    tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice, "LOSS");
+                    tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice, "LOSS",desireProfit.pnl);
                     engineFlag = true;
                   }
                   else {
@@ -238,11 +238,8 @@ export async function _tradeEngine() {
                 console.log('Unbalanced flags detected!');
               }
             }
-
           });
           console.log('------Trade starting Block----')
-
-
           //------Trade starting Area
           console.log(totalInstruments.length);
           for (let i = 0; i < parsedIns.length; i++) {
@@ -252,13 +249,12 @@ export async function _tradeEngine() {
                 exits = true;
               }
             }
-
             if (exits) {
               //Do nothing
               console.log('Already trade placed!');
               console.log('------End Trade starting Block----')
             } else {
-              let side = getFlag(parsedIns[i].flags);
+              let side = getBuyFlag(parsedIns[i].flags);
               if (side != undefined) {
                 if (!onCoolDown(parsedIns[i].symbol, side)) {
                   let price = await getInstrumentPrice(parsedIns[i].symbol);
@@ -503,10 +499,10 @@ function getType(value) {
   }
 }
 
-function getFlag(flags) {
 
+function getSellFlag(flags) {
   console.log(flags);
-  if (flags[0] == flags[1] && flags[0] == flags[2]) {
+  if (flags[0] == flags[1] && flags[0] == flags[4]) {
     return flags[0];
   }
   else {
@@ -514,5 +510,16 @@ function getFlag(flags) {
   }
 }
 
+
+
+function getBuyFlag(flags) {
+  console.log(flags);
+  if (flags[4] && flags[0]) {
+    return flags[4];
+  }
+  else {
+    return undefined;
+  }
+}
 
 
