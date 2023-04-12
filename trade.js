@@ -200,7 +200,7 @@ export async function _tradeEngine() {
               engineFlag = false;
               let prvTrade = await settlePreviousTrade({ side: side, tradeAmount: Math.abs(instruments.positionAmt), symbol: instruments.symbol });
               if (prvTrade["symbol"] == instruments.symbol) {//confirmed closed
-                tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice, "PROFITABLE",desireProfit.pnl);  //Now update that we have completed the trade
+                tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice, "PROFITABLE", desireProfit.pnl);  //Now update that we have completed the trade
                 engineFlag = true;
               }
               else {
@@ -222,7 +222,7 @@ export async function _tradeEngine() {
                   engineFlag = false;
                   let prvTrade = await settlePreviousTrade({ side: side, tradeAmount: Math.abs(instruments.positionAmt), symbol: instruments.symbol });
                   if (prvTrade["symbol"] == instruments.symbol) {//confirmed closed
-                    tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice, "LOSS",desireProfit.pnl);
+                    tradeComplete(instruments.symbol, side, instruments.entryPrice, instruments.markPrice, "LOSS", desireProfit.pnl);
                     engineFlag = true;
                   }
                   else {
@@ -293,13 +293,15 @@ export async function _tradeEngine() {
     console.log(error);
     engineFlag = true;
   }
-
-  console.log('lost trades are : ', lossTrades);
-  console.log('Profitable number of trades: ', ProfitableTrades);
+  logs();
 }
 
 
-
+function logs() {
+  console.log('lost trades are : ', lossTrades);
+  console.log('Profitable number of trades: ', ProfitableTrades);
+  console.log('Total PNL: ', totalPNL);
+}
 
 
 async function getTradeInfo() {
