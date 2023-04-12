@@ -187,9 +187,8 @@ export async function _tradeEngine() {
       await getTradeInfo().then(async InsInfo => {
         const parsedIns = JSON.parse(InsInfo);
         if (engineFlag) {
-
           _data.positions.forEach(async instruments => {
-            console.log('------Positions Block----')
+            // console.log('------Positions Block----')
             totalInstruments.push(instruments);
             updatePrice(instruments.symbol, instruments.markPrice)
             let totalFee = getFees({ tradeAmount: instruments.positionAmt, price: instruments.entryPrice });
@@ -239,7 +238,7 @@ export async function _tradeEngine() {
               }
             }
           });
-          console.log('------Trade starting Block----')
+          // console.log('------Trade starting Block----')
           //------Trade starting Area
           console.log(totalInstruments.length);
           for (let i = 0; i < parsedIns.length; i++) {
@@ -251,8 +250,8 @@ export async function _tradeEngine() {
             }
             if (exits) {
               //Do nothing
-              console.log('Already trade placed!');
-              console.log('------End Trade starting Block----')
+              // console.log('Already trade placed!');
+              // console.log('------End Trade starting Block----')
             } else {
               let side = getBuyFlag(parsedIns[i].flags);
               if (side != undefined) {
